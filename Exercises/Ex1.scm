@@ -175,15 +175,17 @@
 
 ;1.27
 
-(define (is-prime? n upperlimit)
+(define (is-prime? n)
+  (define (loop n upperlimit)
   (cond ((= upperlimit 0) true)
-        ((fermat-test-complete-iter (- upperlimit 1) n) (is-prime? n (- upperlimit 1) ))
+        ((fermat-test-complete-iter (- upperlimit 1) n) (loop n (- upperlimit 1) ))
         (else false)))
+  (loop n n))
 
 (define (fermat-test-complete-iter a n)
     (= (expmod a n n) a))
 
-;(is-prime? 561 561)
+;(is-prime? 561)
 ;1105, 1729, 2465, 2821, and 6601 are other Carmicheal numbers
 
 ;1.28
@@ -271,10 +273,11 @@
 (define (inc x)
   (+ x 1))
 
+(define (identity x)
+x)
+
 (define (factorial n)
-  (define (term x)
-    x)
-  (product term 1 inc n))
+  (product identity 1 inc n))
 
 (define (compute-pi n)
  (define (term k)
@@ -293,6 +296,53 @@
        (product-rec term (next a) next b))))
 
 ;1.32
+
+(define (accumulate combiner null-value term a next b)
+  (if (> a b)
+    null-value
+    (combiner (term a)
+              (accumulate combiner null-value term (next a) next b))))
+
+(define (accumulate-iter combiner null-value term a next b)
+  (define (iter a result)
+  (if (> a b)
+    null-value
+    (iter (next a) (combiner (term a) result))))
+  (iter a null-value))
+
+; (accumulate + 0 term a next b) sum
+; (accumulate * 1 term a next b) product
+
+;1.33
+
+(define (filtered-accumulate combiner null-value term a next b filterVal)
+  (if (> a b)
+    null-value
+    (if (filterVal a)
+      (combiner (term a) 
+                (filtered-accumulate combiner null-value term (next a) next b filterVal))
+      (combiner null-value (filtered-accumulate combiner null-value term (next a) next b filterVal))
+                )))
+
+(define (sum-of-squares-prime a b)
+  (filtered-accumulate + 0 square a inc b is-prime?))
+
+(define (gcd a b) 
+  (if (= b 0)
+    a
+    (gcd b (remainder a b))))
+
+(define (product-rel-primes a b)
+  (define (is-rel-prime? x)
+    (= 1 (gcd x b)))
+  (filtered-accumulate * 1 identity a inc b is-rel-prime?))
+
+
+
+
+
+
+
 
 
 
