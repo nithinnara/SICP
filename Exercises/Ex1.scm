@@ -337,7 +337,11 @@ x)
     (= 1 (gcd x b)))
   (filtered-accumulate * 1 identity a inc b is-rel-prime?))
 
+;1.34
 
+; (f f) -> (f 2) -> (2 2) the interpreter can't resolve 2 as it is not a func
+
+;1.35
 
 
 
