@@ -424,6 +424,50 @@ x)
             (- (* 2 i) 1))
       (cont-frac-iter n d k))
 
+;1.40
+
+(define dx 0.00001)
+
+(define (deriv g)
+  (lambda (x) (/ (- (g (+ x dx)) (g x)) dx)))
+
+(define (newton-transform g)
+  (lambda (x) (- x (/ (g x) ((deriv g) x)))))
+
+(define (newtons-method g guess) (fixed-point (newton-transform g) guess))
+
+(define (cubic a b c)
+  (lambda (x) (+ (cube x) (* a (square x)) (* b x) c)))  
+
+;1.41
+
+;21
+
+;1.42
+
+(define (compose f g x)
+  (f (g x)))
+
+;1.43
+
+(define (repeated f n)
+  (define (iter count)
+    (if (= count 1)
+      f
+      (lambda (x) (f ((iter (- count 1)) x)))))
+  (iter n))
+
+((repeated square 2) 5)
+
+;1.44
+
+(define (smooth f)
+  (lambda (x) (/ 3 (+ (f x) (f (- x dx)) (f (+ x dx))))))
+
+((repeated (smooth square) 2) 2)
+
+;1.45
+
 
 
 
