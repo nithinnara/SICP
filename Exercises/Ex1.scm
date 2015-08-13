@@ -468,8 +468,38 @@ x)
 
 ;1.45
 
+(define (average-damp f)
+  (lambda (x) (average x (f x))))
 
+(define (fixed-point-of-transform g transform guess) 
+  (fixed-point (transform g) guess))
 
+(define (nth-root x n) (fixed-point-of-transform
+                   (lambda (y) (/ x pow(y (- n 1)))) (repeated average-damp n) 1.0)
+;assuming pow as a primitive type y^n-1
+
+;1.46
+
+(define (iterative-improve guess-good? improve-guess)
+    (lambda (guess) (if(guess-good? guess)
+                      guess
+                      (guess-good? (improve-guess guess)))))
+
+(define (sqrt x) 
+  (define (good-enough? guess)
+    (< (abs (- (square guess) x)) 0.001))
+  (define (improve guess) (average guess (/ x guess)))
+  (((iterative-improve good-enough? improve-guess) 1.0)))
+
+(define tolerance 0.00001)
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2)) tolerance)) 
+  (define (good-enough? 
+            (lambda (x) (close-enough? x (f x)))))
+   ((iterative-improve good-enough? f) first-guess))
+
+;***************** End of Chapter 1 *******************
 
 
 
