@@ -195,7 +195,71 @@
     (mul-interval
       x
       (make-interval (/ 1.0 (upper-bound y))
-                   (/ 1.0 (lower-bound y)))))
+                   (/ 1.0 (lower-bound y))))))
+
+(define (add-interval x y)
+  (make-interval (+ (lower-bound x) (lower-bound y))
+                 (+ (upper-bound x) (upper-bound y))))
 
 
-    
+;2.11 
+;boring..
+
+;2.12
+
+(define (make-center-width c w) 
+  (make-interval (- c w) (+ c w)))
+(define (center i)
+  (/ (+ (lower-bound i) (upper-bound i)) 2))
+(define (width i)
+  (/ (- (upper-bound i) (lower-bound i)) 2))
+
+(define (make-center-percent c pt)
+  (make-center-width c (* pt c 0.01)))
+(define (percent i)
+  (* 100 (/ (width i) (center i))))
+
+;2.13
+
+;interval1 (c1-w1,c1+w1)
+;interval2 (c2-w2,c2+w2) 
+;(considering all are positive)
+;int1*int2 = ((c1*c2-c1*w2-w1*c2+w1*w2) , (c1*c2-c2*w2-w2*c2+w1*w2))
+;= (c1*c2) * ((1-t1-t2+t1*t2) , (1+t1+t2+t1*t2))
+;given tolerances are small t1*t2 = 0
+;= (c1*c2) * ((1-t1-t2) * (1+t1+t2))
+
+;so tolerance t is t1+t2
+
+;2.14
+
+(define (par1 r1 r2)
+  (div-interval (mul-interval r1 r2)
+                (add-interval r1 r2)))
+(define (par2 r1 r2)
+  (let ((one (make-interval 1 1)))
+        (div-interval
+          one 
+          (add-interval (div-interval one r1)
+                        (div-interval one r2)))))
+
+(define (print-interval r)
+      (display (lower-bound r))
+      (display " , ")
+      (display (upper-bound r))
+      (newline))
+
+(print-interval (par2 (make-interval 1 2) (make-interval 1 3)))
+(print-interval (par1 (make-interval 1 2) (make-interval 1 3)))
+
+;2.15
+
+;Yes par2 gives tighter bounds than par1 which can be verified using results in 2.14
+;
+;The reason for this is that in interval arthimetic when we use a variable more than
+;once the uncertainity increases as the value can be anything in the interval by
+;using it once we limit the uncertainity to mininum.
+
+
+;2.16
+;One way to go about this is to first reduce any equation to equation in which variables are not repeated but a universal algorithm for this is beyond my reach
