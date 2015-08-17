@@ -262,4 +262,113 @@
 
 
 ;2.16
-;One way to go about this is to first reduce any equation to equation in which variables are not repeated but a universal algorithm for this is beyond my reach
+;One way to go about this is to first reduce any equation to equation in which variables are not repeated but a universal algorithm for this is beyond my reach.
+
+
+;2.17
+
+(define (last-pair lst)
+  (if (null? (cdr lst))
+    (list (car lst))
+    (last-pair (cdr lst))))
+
+(last-pair (list 23 72 149 34))
+
+;2.18
+
+(define (reverse lst)
+  (if (null? lst)
+    ()
+    (append (reverse (cdr lst)) (list (car lst)))))
+
+(reverse (list 1 4 9 16 25))
+
+;2.19
+
+(define (cc amount coin-values) 
+  (cond ((= amount 0) 1)
+        ((or (< amount 0) (no-more? coin-values)) 0) 
+        (else 
+           (+ (cc amount
+                  (except-first-denomination
+                    coin-values))
+              (cc (- amount
+                     (first-denomination
+                       coin-values))
+                  coin-values)))))
+
+(define us-coins (list 50 25 10 5 1))
+(define uk-coins (list 100 50 20 10 5 2 1 0.5))
+
+(define (length items)
+(define (length-iter a count)
+  (if (null? a) count
+            (length-iter (cdr a) (+ 1 count))))
+  (length-iter items 0))
+
+(define (no-more? lst)
+   (= (length lst) 0))
+
+(define (except-first-denomination kinds-of-coins)
+  (cdr kinds-of-coins))
+   
+(define (first-denomination kinds-of-coins)
+  (car kinds-of-coins))
+
+(cc 100 us-coins)
+
+;2.20
+
+(define (square-list items) 
+  (if (null? items)
+    ()
+    (cons (square (car items)) (square-list (cdr items)))))
+
+(define (square-list items)
+  (map square items))
+
+(define (map proc items) 
+  (if (null? items)
+    ()
+    (cons (proc (car items))
+          (map proc (cdr items)))))
+
+
+(square-list (list 1 2 3 4))
+
+;2.21
+
+(define (square-list items) 
+  (define (iter things answer)
+    (if (null? things) answer
+      (iter (cdr things)
+            (cons (square (car things))
+                   answer ))))
+  (iter items ()))
+
+;This doesn't work the car is appended at the end so it gets reversed
+
+(define (square-list items) 
+  (define (iter things answer)
+    (if (null? things) answer
+      (iter (cdr things)
+            (cons answer 
+                  (square (car things))))))
+  (iter items ()))
+
+;In this case the order is correct but the output will not be a list
+
+;2.23
+
+(define (for-each x items)
+  (if (= (car items) x)
+    #t
+    (for-each x (cdr items))))
+
+(for-each 321 (list 57 321 88))
+
+
+
+
+
+
