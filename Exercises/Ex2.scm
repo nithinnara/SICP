@@ -361,12 +361,63 @@
 ;2.23
 
 (define (for-each x items)
-  (if (= (car items) x)
-    #t
-    (for-each x (cdr items))))
+  (if (null? items) 
+    #f
+    (if (= (car items) x)
+        #t
+        (for-each x (cdr items)))))
 
-(for-each 321 (list 57 321 88))
+(for-each 322 (list 57 321 88))
 
+;2.24
+
+;2.25
+
+(cdr (car (cdr (cdr (list 1 3 (list 5 7) 9)))))
+
+(car (car (list (list 7))))
+
+(define big-tree
+  (list 1 (list 2 (list 3 (list 4 (list 5 (list 6 7)))))))
+
+(define (get7 tree f n)
+  (if(= n 0)
+    (f tree)
+    (get7 (f tree) f (- n 1))))
+
+(get7 big-tree (lambda (x) (car (cdr x)))  5)
+
+;2.26
+
+(define x (list 1 2 3))
+(define y (list 4 5 6))
+
+(append x y)
+(cons x y)
+(list x y)
+
+;2.27
+
+(define x (list (list 1 (list 5 6)) (list 3 4)))
+
+(define (deep-reverse tree) 
+  (if (list? tree) 
+    (reverse (map deep-reverse tree)) 
+    tree)) 
+
+(deep-reverse x)
+
+;2.28
+
+
+
+
+
+
+
+
+
+    
 
 
 
