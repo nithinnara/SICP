@@ -409,17 +409,83 @@
 
 ;2.28
 
+(define (fringe tree)
+  (if (null? tree)
+    ()
+    (if (list? tree)
+        (append (fringe (car tree)) (fringe (cdr tree)))
+        (list tree))))
+
+(fringe x)
+
+;2.29
+
+(define (make-mobile left right) 
+  (list left right))
+
+(define (left-branch mobile)
+  (car mobile))
+(define (right-branch mobile)
+  (cdr mobile))
+
+(define (make-branch length structure) 
+  (list length structure))
+
+(define (branch-length branch)
+  (car branch))
+(define (branch-structure branch)
+  (cdr branch))
+
+(define (total-weight mobile)
+  (let ((l (left-branch mobile))
+        (r (right-branch mobile)))
+    (define (get-weight branch)
+      (if (null? branch)
+        0
+      (if (pair? branch)
+        (+ (total-weight branch))
+            branch)))
+  (+ (get-weight l) (get-weight r))))
 
 
+(total-weight (make-mobile (list 2 5) (list 2 5)))
 
+;2.30
 
+(define (square-tree tree) 
+  (cond ((null? tree) ())
+        ((not (pair? tree)) (square tree))
+        (else (cons (square-tree (car tree))
+                    (square-tree (cdr tree))))))
 
+(square-tree (list 1 (list 2 (list 3 4) 5) (list 6 7)))
 
+(define (square-tree tree) 
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree) 
+           (square-tree sub-tree) 
+           (square sub-tree)))
+       tree))
 
+;2.31
 
-    
+(define (tree-map f tree)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+           (tree-map f sub-tree)
+           (f sub-tree)))
+       tree))
 
+(define (square-tree tree) (tree-map square tree))
 
+;2.32
 
+(define (subsets s) 
+  (if (null? s)
+    (list ())
+    (let ((rest (subsets (cdr s))))
+      (append rest (map (lambda (x) (append (list (car s)) x)) rest)))))
+
+(subsets (list 1 2 3))
 
 
