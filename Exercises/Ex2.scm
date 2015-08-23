@@ -580,3 +580,103 @@
   (fold-right (lambda (x y) (append y (list x) )) nil sequence))
 (define (reverse sequence)
   (fold-left (lambda (x y) (cons y x)) nil sequence))
+
+;2.40
+
+(define (enumerate-interval low high) 
+  (if (> low high)
+    nil
+    (cons low (enumerate-interval (+ low 1) high))))
+
+(define (flatmap proc seq)
+  (accumulate append nil (map proc seq)))
+
+(define (unique-pairs n)
+    (flatmap (lambda (i)
+               (map (lambda (j)
+                      (list i j))
+                    (enumerate-interval 1 (- i 1))))
+                        (enumerate-interval 1 n)))
+
+(unique-pairs 10) 
+
+(define (prime-sum-pairs n) 
+  (map make-pair-sum
+       (filter prime-sum? (unique-pairs n))))
+
+;2.41
+
+(define (triples n s)
+  (map (lambda (y) (make-triplet-sum y s))
+       (filter (lambda (x) 
+                 (sum-equals-neg-of-s? x s (enumerate-interval 1 n))) 
+               (unique-pairs n))))
+
+(define (sum-equals-neg-of-s? pair s n)
+  (if (null? n)
+    #f
+    (if (= (+ (car pair) (cadr pair) (car n)) s)
+      #t
+      (sum-equals-neg-of-s? pair s (cdr n)))))
+
+(define (make-triplet-sum pair s)
+  (list (car pair) (cadr pair) (- s (+ (car pair) (cadr pair)))))
+
+;TODO: very laborious solution, improve this...
+(triples 10 5)
+
+;2.42
+
+(define (queens board-size) 
+  (define (queen-cols k)
+    (if (= k 0)
+      (list empty-board) (filter
+                           (lambda (positions) (safe? k positions)) 
+                           (flatmap
+                             (lambda (rest-of-queens) 
+                               (map (lambda (new-row) 
+                                      (adjoin-position
+                                        new-row k rest-of-queens))
+                                    (enumerate-interval 1 board-size)))
+                             (queen-cols (- k 1))))))
+  (queen-cols board-size))
+
+(define (adjoin-position new-row k rest-of-queens)
+(cons new-row rest-of-queens))
+(define empty-board ())
+
+(define (safe? k positions)
+  (define queen (car positions))
+  (define (safe-iter up down positions)
+    (if (null? positions)
+      #t
+      (let ((pos (car positions)))
+      (if (or (= pos up)
+              (= pos down)
+              (= pos queen))
+      #f
+      (safe-iter (- up 1) (+ down 1) (cdr positions))))))
+  (safe-iter (- queen 1) (+ queen 1) (cdr positions)))
+
+(queens 6)
+
+;2.43
+
+(define (queens board-size) 
+  (define (queen-cols k)
+    (if (= k 0)
+      (list empty-board) (filter
+                           (lambda (positions) (safe? k positions)) 
+                           (flatmap
+                             (lambda (new-row) 
+                               (map (lambda (rest-of-queens) 
+                                      (adjoin-position
+                                        new-row k rest-of-queens))
+                                    (queen-cols (- k 1))))
+                               (enumerate-interval 1 board-size)))))
+  (queen-cols board-size))
+
+;Queen-cols will now be called for every item in enumerated interval of boardsize
+;so the new time will be size^size * T
+
+
