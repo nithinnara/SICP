@@ -679,4 +679,107 @@
 ;Queen-cols will now be called for every item in enumerated interval of boardsize
 ;so the new time will be size^size * T
 
+;2.44
+
+(define (up-split painter n) 
+  (if (= n 0)
+    painter
+    (let ((smaller (right-split painter (- n 1))))
+      (below painter (beside smaller smaller)))))
+
+;2.45
+
+(define (split pos1 pos2)
+  (lambda painter n)
+  (if (= n 0)
+    (let ((smaller ((split pos1 pos2) painter (- n 1))))
+      (pos1 painter (pos2 smaller smaller)))))
+
+(define right-split (split beside below)) 
+(define up-split (split below beside))
+
+;2.46
+
+(define (make-vect x y)
+  (cons x y))
+(define (xcor-vect v)
+  (car v))
+(define (ycor-vect v)
+  (cdr v))
+
+(define (add-vect v1 v2)
+  (make-vect (+ (xcor-vect v1) (xcor-vect v2)) (+ (ycor-vect v1) (ycor-vect v2))))
+(define (sub-vect v1 v2)
+ (make-vect (- (xcor-vect v1) (xcor-vect v2)) (- (ycor-vect v1) (ycor-vect v2))))
+(define (scale-vect v s)
+ (make-vect (* (xcor-vect v1) s) (* (ycor-vect v1) s)))
+
+;2.47
+
+(define (make-frame origin edge1 edge2) 
+  (list origin edge1 edge2))
+
+(define (origin-frame frame)
+  (car frame))
+(define (edge1-frame frame)
+  (cadr frame))
+(define (edge2-frame frame)
+  (caddr frame))
+
+(define (make-frame origin edge1 edge2) 
+  (cons origin (cons edge1 edge2)))
+;;same origin and edge1 procedures as above
+(define (edge2-frame frame)
+  (cddr frame))
+
+;2.48
+
+(define (make-segment v1 v2)
+  (cons v1 v2))
+(define (start-segment seg)
+  (car seg))
+(define (end-segment seg)
+  (cdr seg))
+
+;2.49
+
+(define (frame-coord-map frame) 
+  (lambda (v)
+    (add-vect
+      (origin-frame frame)
+      (add-vect (scale-vect (xcor-vect v) (edge1-frame frame))
+                (scale-vect (ycor-vect v) (edge2-frame frame))))))
+
+(define (segments->painter segment-list) 
+  (lambda (frame)
+    (for-each
+      (lambda (segment)
+        (draw-line
+          ((frame-coord-map frame)
+           (start-segment segment))
+          ((frame-coord-map frame)
+           (end-segment segment))))
+      segment-list)))
+
+;a
+(define (outline frame)
+(segments->painter (list (make-segment (make-vect 0 0) (make-vect 0 1))
+                          (make-segment (make-vect 0 1) (make-vect 1 1))
+                          (make-segment (make-vect 1 1) (make-vect 1 0))
+                          (make-segment (make-vect 0 0) (make-vect 1 0))))
+ frame)
+
+;b
+(define (cross frame)
+(segments->painter (list (make-segment (make-vect 0 1) (make-vect 1 0))
+                          (make-segment (make-vect 0 0) (make-vect 1 1))))
+ frame)
+
+;c
+;similarly make midpoints
+
+;d
+;tedious and certainly boring...
+
+
 
