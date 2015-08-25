@@ -782,4 +782,83 @@
 ;tedious and certainly boring...
 
 
+;2.50
+
+(define (flip-horiz painter)
+  (transform-painter painter
+                     (make-vect 1.0 0.0)
+                     (make-vect 1.0 1.0)
+                     (make-vect 0.0 0.0)))
+
+(define (rotate-counter180 painter)
+  (transform-painter painter
+                     (make-vect 1.0 1.0)
+                     (make-vect 0.0 1.0)
+                     (make-vect 1.0 0.0)))
+
+(define (rotate-counter270 painter)
+(transform-painter painter
+                     (make-vect 0.0 1.0)
+                     (make-vect 0.0 0.0)
+                     (make-vect 1.0 1.0)))
+;2.51
+
+(define (below painter1 painter2)
+  (let ((split-point (make-vect 0.0 0.5)))
+    (let ((paint-below 
+            (transform-painter
+              painter1
+              (make-vect 0.0 0.0)
+              split-point
+              (make-vect 1.0 0.0)))
+          (paint-top
+            (transform-painter
+              painter2
+              split-point
+              (make-vect 1.0 0.5)
+              (make-vect 0.0 1.0))))
+      (lambda (frame) (paint-below frame) (paint-top frame)))))
+
+(define (below painter1 painter2)
+   (rotate-counter270 (beside (rotate90 painter1)  (rotate90 painter2) )))
+
+;2.52
+
+;b
+(define (corner-split painter n) 
+  (if (= n 0)
+    painter
+    (let ((up (up-split painter (- n 1)))
+          (right (right-split painter (- n 1)))      
+          (corner (corner-split painter (- n 1))))
+        (beside (below up painter)
+                (below corner right)))))
+;c
+(define (square-limit painter n)
+    (let ((combine4 (square-of-four identity flip-horiz
+                                    rotate90 rotate180)))
+      (combine4 (corner-split painter n))))
+
+;2.53
+
+(define (memq item x) 
+  (cond ((null? x) false)
+        ((eq? item (car x)) x) 
+        (else (memq item (cdr x)))))
+
+;2.54
+
+(define (equal? l1 l2)
+  (cond ((and (not (pair? l1)) (not (pair?  l2))) 
+         (eq?  l1 l2))  
+        ((and (pair? l1)  (pair? l2)) 
+         (and (equal? (car l1) (car l2)) (equal? (cdr l1) (cdr l2))))
+        (else #f)))
+
+(equal? '(this is a list) '(this is a list))
+
+;2.55
+
+;Interpreter must have interpreted as (car (quote (quote abracadabra)))
+;this can be verified by seeing the result of (cadr ''abracadabra)
 
