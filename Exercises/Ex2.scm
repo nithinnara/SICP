@@ -898,3 +898,91 @@
 
           (else
           (error "unknown expression type: DERIV" exp))))
+
+;2.57
+
+(define (augend s)
+  (define (iter s)
+    (if (null? s)
+      0
+      (+ (addend s) (augend s))))
+  (iter (cadr s)))
+
+(define (multiplicand p) 
+  (define (iter p)
+    (if (null? p)
+      1
+      (* (multiplier p) (multiplicand p))))
+  (iter (cadr p)))
+
+;2.58
+;a
+
+(define (sum? x) (and (pair? x) (eq? (cadr x) '+)))
+
+(define (addend s) (car s))
+(define (augend s) (caddr s))
+
+(define (product? x)
+    (and (pair? x) (eq? (cadr x) '*)))
+
+(define (multiplier p) (car p))
+(define (multiplicand p) (caddr p))
+
+;2.59
+
+(define (union-set set1 set2)
+  (define (set1-not-in-set2 set1 set2)
+  (cond ((null? set1) set2)
+        ((null? set2) set1)
+        ((element-of-set? (car set1) set2)
+                          (set1-not-in-set2 (cdr set1) set2))
+                (else (cons (car set1) (set1-not-in-set2 (cdr set1) set2)))))
+  (cons set2 (set1-not-in-set2 set1 set2)))
+
+;2.60
+
+(define (element-of-set? x set) 
+  (cond ((null? set) false)
+        ((equal? x (car set)) true)
+        (else (element-of-set? x (cdr set)))))
+
+(define (adjoin-set x set) 
+    (cons x set))
+
+(define (intersection-set set1 set2)
+  (cond ((or (null? set1) (null? set2)) '())
+        ((element-of-set? (car set1) set2)
+         (cons (car set1) (intersection-set (cdr set1) set2)))
+        (else (intersection-set (cdr set1) set2))))
+
+(define (union-set set1 set2)
+  (cons set1 set2))
+
+;Performance of adjoin and union operations would be better but intersection and
+;element-of-set? procedures would be inefficient expecially if the size grows 
+
+;2.61
+
+(define (adjoin-set x set)
+  (define (insert first-part set)
+  (cond ((null? set) x)
+        ((= x (car set)) set)
+        ((< x (car set)) (cons x set))
+        (else (insert (cons first-part (car set)) (cdr set)))))
+  (insert '() set))
+
+;2.61
+
+(define (union-set set1 set2)
+  (cond ((null? set1) set2)
+        ((null? set2) set1)
+        (< (car set1) (car set2) (cons 
+                                   (car set1) 
+                                   (union-set (cdr set1) set2)))
+        (> (car set1) (car set2) (cons 
+                                   (car set2) 
+                                   (union-set set1 (cdr set2))))
+        (else (cons (car set1) (union-set (cdr set1) (cdr set2))))))
+  
+
