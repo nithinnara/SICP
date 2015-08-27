@@ -862,3 +862,39 @@
 ;Interpreter must have interpreted as (car (quote (quote abracadabra)))
 ;this can be verified by seeing the result of (cadr ''abracadabra)
 
+;2.56
+
+(define (base exp)
+  (cadr exp))
+
+(define (make-exponentiation base exponent)
+  (cond ((=number? base 0) 1)
+        ((=number? base 1) base)
+        ((and (number? base) (number? exponent)) (expt base exponent))
+        (else (list '** base exponent))))
+
+(define (exponent exp)
+  (caddr exp))
+
+(define (exponentiation? exp)
+  (and (pair? exp) (eq? (car exp) '**)))
+
+(define (deriv exp var) 
+  (cond ((number? exp) 0)
+        ((variable? exp) (if (same-variable? exp var) 1 0)) 
+        ((sum? exp) (make-sum (deriv (addend exp) var)
+                              (deriv (augend exp) var)))
+        ((product? exp)
+         (make-sum
+           (make-product (multiplier exp)
+                         (deriv (multiplicand exp) var))
+           (make-product (deriv (multiplier exp) var)
+                         (multiplicand exp))))
+          ((exponentiation? exp) (make-product 
+                                 (make-product 
+                                   (exponent exp) 
+                                   (make-exponentiation (base exp) (- (exponent n) 1)))
+                                 (deriv (base exp) var)))
+
+          (else
+          (error "unknown expression type: DERIV" exp))))
