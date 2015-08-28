@@ -930,6 +930,10 @@
 (define (multiplicand p) (caddr p))
 
 ;2.59
+(define (element-of-set? x set) 
+  (cond ((null? set) false)
+        ((equal? x (car set)) true)
+        (else (element-of-set? x (cdr set)))))
 
 (define (union-set set1 set2)
   (define (set1-not-in-set2 set1 set2)
@@ -938,7 +942,7 @@
         ((element-of-set? (car set1) set2)
                           (set1-not-in-set2 (cdr set1) set2))
                 (else (cons (car set1) (set1-not-in-set2 (cdr set1) set2)))))
-  (cons set2 (set1-not-in-set2 set1 set2)))
+   (set1-not-in-set2 set1 set2))
 
 ;2.60
 
@@ -972,17 +976,46 @@
         (else (insert (cons first-part (car set)) (cdr set)))))
   (insert '() set))
 
-;2.61
+;2.62
 
 (define (union-set set1 set2)
   (cond ((null? set1) set2)
         ((null? set2) set1)
-        (< (car set1) (car set2) (cons 
+        ((< (car set1) (car set2)) (cons 
                                    (car set1) 
                                    (union-set (cdr set1) set2)))
-        (> (car set1) (car set2) (cons 
+        ((> (car set1) (car set2)) (cons 
                                    (car set2) 
                                    (union-set set1 (cdr set2))))
         (else (cons (car set1) (union-set (cdr set1) (cdr set2))))))
-  
+
+;;Binary Trees
+;2.63
+
+(define (tree->list-1 tree)
+    (if (null? tree)
+            '()
+            (append (tree->list-1 (left-branch tree))
+                    (cons (entry tree)
+                          (tree->list-1 (right-branch tree))))))
+
+
+(define (tree->list-2 tree)
+    (define (copy-to-list tree result-list)
+          (if (null? tree)
+            result-list
+            (copy-to-list (left-branch tree)
+                          (cons (entry tree)
+                                (copy-to-list (right-branch tree)
+                                              result-list)))))
+    (copy-to-list tree '()))
+
+;Both produces same result
+;
+;Complexity of 1st version is O(nlogn) 
+;T(n) = 2*T(n/2) + O(n) 
+;append procedure has to traverse the left list which takes O(n)
+;of 2nd version is O(n)
+;T(n)  = 2*T(n/2) + O(1) here we just cons the entry constant time
+
 
