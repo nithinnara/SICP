@@ -1191,7 +1191,51 @@
 
 (generate-huffman-tree '((A 4) (B 2) (C 5) (D 1)))
 
+;2.70
 
+(define (rock-song-tree)
+  (generate-huffman-tree '((A 2) (GET 2) (SHA 3) (WAH 1) 
+                                 (BOOM 1) (JOB 2) (NA 16) (YIP 9))))
+(define (rock-song)
+  '(Get a job
+        Sha na na na na na na na na
+        Get a job
+        Sha na na na na na na na na
+        Wah yip yip yip yip yip yip yip yip yip
+        Sha boom))
+
+(encode (rock-song) (rock-song-tree))
+
+;2.71
+
+(generate-huffman-tree '((A 1) (B 2) (C 4) (D 8) (E 16)))
+
+(generate-huffman-tree '((A 1) (B 2) (C 4) (D 8) 
+                               (E 16) (F 32) (G 64) (H 128) (I 256)))
+
+;            {A,B,C,D,E} 31
+;                /\
+;               /  \
+;              /    \
+;       {A,B,C,D} 15 {E} 16
+;            /\
+;           /  \
+;     {A,B,C} 7 {D} 8
+;        /\
+;       /  \
+;    {A,B} 3 {C} 4
+;     /\
+;    /  \
+;  {A} 1 {B} 2 
+
+;Similarly for n = 10, can get pretty long
+;For general n bits for most frequent symbol = 1
+;for least frequent symbol it should be  = n-1
+
+;2.72
+
+;Worst case O(n^2) time for least frequent symbol as we need to traverse entire tree
+;O(n) for most frequent symbol as we dont need to traverse the tree
 
 
 
